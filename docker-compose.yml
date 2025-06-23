@@ -1,0 +1,33 @@
+services:
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: usuariosapp_sqlserver
+    ports:
+      - "1435:1433"
+    environment:
+      SA_PASSWORD: "Coti@2025"
+      ACCEPT_EULA: "Y"
+    networks:
+      - usuariosapp-network
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: usuariosapp_rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - usuariosapp-network
+
+networks:
+  usuariosapp-network:
+    driver: bridge
+
+volumes:
+  sqlserver_data:
