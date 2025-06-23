@@ -11,10 +11,9 @@ public class UsuariosTest
     private const string _apiCriarUsuario = "/api/usuarios/criar";
     private const string _apiAutenticarUsuario = "/api/usuarios/autenticar";
 
-    public UsuariosTest(HttpClient httpClient)
+    public UsuariosTest()
     {
         _httpClient = new WebApplicationFactory<Program>().CreateClient();
-
         _faker = new Faker("pt_BR");
     }
 
