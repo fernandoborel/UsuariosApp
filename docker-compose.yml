@@ -1,13 +1,25 @@
 services:
-
+  usuariosapp:
+    container_name: usuariosapp_api
+    build:
+        context: .
+        dockerfile: UsuariosApp.API/Dockerfile
+    ports:
+        - "8080:8080"   
+    networks:
+      - usuariosapp-network
+    depends_on:
+      - sqlserver
+      - rabbitmq
+    
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: usuariosapp_sqlserver
     ports:
-      - "1435:1433"
+      - "1434:1433"
     environment:
-      SA_PASSWORD: "Coti@2025"
       ACCEPT_EULA: "Y"
+      SA_PASSWORD: Coti@2025
     networks:
       - usuariosapp-network
     volumes:
