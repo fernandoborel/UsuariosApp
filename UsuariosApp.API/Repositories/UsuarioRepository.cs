@@ -11,14 +11,14 @@ public class UsuarioRepository(string connectionString)
     public async Task<Usuario?> Obter(string email, string senha)
     {
         using var connection = new SqlConnection(connectionString);
+        await connection.OpenAsync();
 
         try
         {
-            var query = @"SELECT u.ID, u.NOME, u.EMAIL, u.PERFILID,
-                                p.ID, p.NOME
-                          FROM USUARIO u
-                          INNER JOIN PERFIL p
-                          WHERE u.EMAIL = @Email AND u.Senha";
+            var query = @"SELECT u.ID, u.NOME, u.EMAIL, u.PERFILID, p.ID, p.NOME
+                            FROM USUARIO u
+                            INNER JOIN PERFIL p ON u.PERFILID = p.ID
+                        WHERE u.EMAIL = @Email AND u.SENHA = @Senha";
 
             var result = await connection.QueryAsync(query, (Usuario usuario, Perfil perfil) =>
             {
@@ -40,6 +40,7 @@ public class UsuarioRepository(string connectionString)
     {
         //connectionString
         using var connection = new SqlConnection(connectionString);
+        await connection.OpenAsync();
 
         //capturando o id do usuário
         usuario.PerfilId = await connection.QueryFirstOrDefaultAsync<Guid?>(
