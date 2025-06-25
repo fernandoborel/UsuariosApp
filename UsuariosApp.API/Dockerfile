@@ -6,13 +6,12 @@ USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
 
-
 # Esta fase é usada para compilar o projeto de serviço
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["UsuariosApp.API/UsuariosApp.API.csproj", "UsuariosApp.API/"]
-RUN dotnet restore "./UsuariosApp.API/UsuariosApp.API.csproj"
+RUN dotnet restore --no-cache "./UsuariosApp.API/UsuariosApp.API.csproj"
 COPY . .
 WORKDIR "/src/UsuariosApp.API"
 RUN dotnet build "./UsuariosApp.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
@@ -26,4 +25,8 @@ RUN dotnet publish "./UsuariosApp.API.csproj" -c $BUILD_CONFIGURATION -o /app/pu
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+# Define o ambiente como Development
+ENV ASPNETCORE_ENVIRONMENT=Development
+
 ENTRYPOINT ["dotnet", "UsuariosApp.API.dll"]

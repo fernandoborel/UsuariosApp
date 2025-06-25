@@ -3,10 +3,11 @@ using UsuariosApp.API.Components;
 using UsuariosApp.API.Entities;
 using UsuariosApp.API.Repositories;
 
-namespace UsuariosApp.API.Controllers;
+namespace UsuariosApp.API.Controllers.V1;
 
-[Route("api/[controller]")]
 [ApiController]
+[ApiExplorerSettings(GroupName = "v1")]
+[Route("api/v1/[controller]")]
 public class UsuariosController(UsuarioRepository usuarioRepository, JwtBearerComponent jwtBearerComponent) : ControllerBase
 {
     [HttpPost("autenticar")] //api/usuarios/autenticar
