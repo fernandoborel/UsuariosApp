@@ -8,7 +8,7 @@ namespace UsuariosApp.API.Controllers.V1;
 [ApiController]
 [ApiExplorerSettings(GroupName = "v1")]
 [Route("api/v1/[controller]")]
-public class UsuariosController(UsuarioRepository usuarioRepository, JwtBearerComponent jwtBearerComponent) : ControllerBase
+public class UsuariosController(UsuarioRepository usuarioRepository, JwtBearerComponent jwtBearerComponent, RabbitMQComponent rabbitMQComponent) : ControllerBase
 {
     [HttpPost("autenticar")] //api/usuarios/autenticar
     public async Task<IActionResult> Autenticar([FromBody] AutenticarUsuarioRequest request)
@@ -50,6 +50,7 @@ public class UsuariosController(UsuarioRepository usuarioRepository, JwtBearerCo
     {
         try
         {
+            //criando usuário
             var usuario = new Usuario
             {
                 Nome = request.Nome,
@@ -57,9 +58,23 @@ public class UsuariosController(UsuarioRepository usuarioRepository, JwtBearerCo
                 Senha = request.Senha
             };
 
+            //gravando na base de dados
             var id = await usuarioRepository.Inserir(usuario);
 
-            return StatusCode(201, new { Message = "Usuário criado com sucesso.", Id = id });
+            //criando evento
+            var usuarioCriado = new UsuarioCriadoEvent(
+                usuario.Nome, usuario.Email, DateTime.Now);
+
+            //Envindo o evento para a fila RabbitMQ
+            await rabbitMQComponent.Publish(usuarioCriado);
+
+            return StatusCode(201, new { Message = "Usuário criado com sucesso.", 
+            Usuario = new { 
+                    Id = id,
+                    usuario.Nome,
+                    usuario.Email,
+                }
+            });
         }
         catch (ApplicationException e)
         {

@@ -17,7 +17,14 @@ public static class DependencyInjectionExtension
 
         services.AddSingleton(jwtSettings);
         services.AddSingleton<JwtBearerComponent>();
-        
+
+        //RabbitMQ
+        var rabbitMQSettings = new RabbitMQSettings();
+        new ConfigureFromConfigurationOptions<RabbitMQSettings>(configuration.GetSection("RabbitMQSettings")).Configure(rabbitMQSettings);
+
+        services.AddSingleton(rabbitMQSettings);
+        services.AddScoped<RabbitMQComponent>();
+
         return services;
     }
 }
